@@ -28,6 +28,13 @@ h1 {
     font-size: 32px;
 } 
 
+h2 {
+    text-align: center;
+    color: #111;
+    margin-bottom: 20px;
+    font-size: 32px;
+} 
+
 p {
     text-align: center;
     color: #333;
