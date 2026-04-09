@@ -3,5 +3,5 @@ import react from '@vitejs/react-swc'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/Pilvipalvelut_web-kehityksess-/matrix-way', 
+  base: '/Pilvipalvelut_web-kehityksess-/', 
 })
