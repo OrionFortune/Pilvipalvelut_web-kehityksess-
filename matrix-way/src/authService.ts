@@ -1,11 +1,9 @@
 import { 
   getAuth, 
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut, 
-  User, 
-  UserCredential 
+  signOut 
 } from "firebase/auth";
+import type { User, UserCredential } from "firebase/auth"; 
 import { initializeApp } from "firebase/app";
 import firebaseConfig from "./firebaseConfig"; 
 
