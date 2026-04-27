@@ -1,32 +1,35 @@
 import { useState, useEffect } from 'react'
 import { onAuthStateChanged, type User } from "firebase/auth";
+import { onSnapshot, doc, getFirestore } from "firebase/firestore";
 import { auth, logout } from "./authService";
 import LoginForm from "./LoginForm";
 import './App.css'
 
+import type { Session } from './types/game';
+import { createSession, submitGuess, joinSession } from './services/gameSessionService';
+import { QuizForm } from './components/QuizForm'; 
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [codename, setCodename] = useState<string>("");
+  const [session, setSession] = useState<Session | null>(null);
+  const [joinId, setJoinId] = useState("");
 
   const generateCodename = () => {
     const adjectives = ["SneakyBoyscout", "BraveNeo", "Cyberbro", "Mysticbox", "Goldenapple", "SilentHill"];
     const nouns = ["PandaOnRanta", "KingTiger2", "Fatcon", "HostCost69", "Holdthedor", "ShadowCryDise"];
-    
     const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
     const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
     const randomNumber = Math.floor(Math.random() * 100);
-    
     return `${randomAdj}${randomNoun}${randomNumber}`;
   };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
-
       if (firebaseUser) {
         const storageKey = `codename_${firebaseUser.uid}`;
         const cachedName = localStorage.getItem(storageKey);
-
         if (cachedName) {
           setCodename(cachedName);
         } else {
@@ -36,11 +39,50 @@ function App() {
         }
       } else {
         setCodename("");
+        setSession(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!session?.id) return;
+
+    const db = getFirestore();
+    const unsubscribe = onSnapshot(doc(db, "sessions", session.id), (snapshot) => {
+      if (snapshot.exists()) {
+        console.log("Data from Firestore had updated:", snapshot.data());
+        setSession({ id: snapshot.id, ...snapshot.data() } as Session);
       }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [session?.id]);
+
+  const handleStartGame = async () => {
+    console.log("--- Game starting ---");
+    if (user) {
+      try {
+        const sessionId = await createSession("New Game", codename, user.uid);
+        console.log("✅ Success! ID:", sessionId);
+        setSession({ id: sessionId } as any); 
+      } catch (err) {
+        console.error("❌ Error:", err);
+        alert("Error starting game");
+      }
+    }
+  };
+
+  const handleJoinGame = async () => {
+    if (!joinId.trim() || !user) return;
+    try {
+      await joinSession(joinId.trim(), codename, user.uid);
+      setSession({ id: joinId.trim() } as any);
+    } catch (err) {
+      console.error("❌ Join Error:", err);
+      alert("Room not found!"); 
+    }
+  };
 
   const handleReset = () => {
     if (user) {
@@ -60,34 +102,77 @@ function App() {
         {user ? (
           <>
             <div className="card">
-              <p>👋 Hello, {user.email}</p>
-              <p>Your nickname:</p>
-              <h2 style={{ color: '#68a4ff', fontSize: '2.5rem' }}>
-                {codename || "Generating..."}
-              </h2>
+              <p>👋 Hei, {user.email}</p>
+              <p>Nimimerkkisi: <strong style={{ color: '#68a4ff' }}>{codename}</strong></p>
             </div>
 
-            <button className="counter" onClick={handleReset}>
-              Generate new nickname
-            </button>
+            {!session ? (
+              <div className="setup-actions" style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
+                <button className="counter" onClick={handleStartGame}>
+                  🚀 Aloita uusi peli
+                </button>
 
-            <button 
-              onClick={logout} 
-              style={{ marginTop: '20px', background: 'transparent', color: '#ff4d4d', border: '1px solid #ff4d4d', padding: '5px 10px', cursor: 'pointer' }}
-            >
-              Sign Out
-            </button>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Syötä huoneen ID" 
+                    value={joinId}
+                    onChange={(e) => setJoinId(e.target.value)}
+                    style={{ 
+                      padding: '10px', 
+                      borderRadius: '5px', 
+                      border: '1px solid #444', 
+                      background: '#222', 
+                      color: 'white' 
+                    }}
+                  />
+                  <button onClick={handleJoinGame}>
+                    Liity
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ marginTop: '20px', padding: '20px', border: '2px solid #68a4ff', borderRadius: '10px', background: '#1a1a1a' }}>
+                <h3>🎮 Pelihuone aktiivinen</h3>
+                <p>Tila: <span style={{ color: '#4caf50' }}>{session.status}</span></p>
+                <p>Arvaa hinta tuotteelle:</p>
+                <h2 style={{ color: '#ffcc00' }}>{session.productName || "Etsitään tuotetta..."}</h2>
+                
+                <QuizForm 
+                  players={session.players || []}
+                  currentUserId={user.uid}
+                  onSubmitGuess={(guessValue) => 
+                    submitGuess(session.id, session.players || [], user.uid, guessValue)
+                  }
+                  correctPrice={
+                    session.players?.find(p => p.id === user.uid)?.guess !== null 
+                    ? (session.correctPrice ?? undefined) 
+                    : undefined
+                  }
+                />
+
+                <p style={{ fontSize: '0.8rem', opacity: 0.5, marginTop: '15px' }}>Room ID: {session.id}</p>
+              </div>
+            )}
+
+            <div style={{ marginTop: '20px' }}>
+              <button onClick={handleReset} style={{ fontSize: '0.8rem', marginRight: '10px' }}>
+                Vaihda nimimerkki
+              </button>
+              <button 
+                onClick={logout} 
+                style={{ background: 'transparent', color: '#ff4d4d', border: '1px solid #ff4d4d', padding: '5px 10px', cursor: 'pointer' }}
+              >
+                Kirjaudu ulos
+              </button>
+            </div>
           </>
         ) : (
           <LoginForm />
         )}
-
-        <p style={{ marginTop: '25px', opacity: 0.7 }}>
-          {user ? "Your nickname is tied to your account." : "Please log in to see your nickname."}
-        </p>
       </section>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
