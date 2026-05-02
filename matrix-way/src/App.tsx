@@ -5,9 +5,26 @@ import { auth, logout } from "./authService";
 import LoginForm from "./LoginForm";
 import './App.css'
 
+// Analytics integration
+import ConsentBanner from './components/ConsentBanner';
+import { useCloudflareAnalytics } from './hooks/useCloudflareAnalytics';
+
 import type { Session } from './types/game';
 import { createSession, submitGuess, joinSession } from './services/gameSessionService';
 import { QuizForm } from './components/QuizForm'; 
+
+// Component for tracking page views
+function RouteAnalytics() {
+  const { trackEvent } = useCloudflareAnalytics();
+  
+  useEffect(() => {
+    trackEvent("page_view", {
+      landingPath: window.location.pathname,
+    });
+  }, [trackEvent]);
+
+  return null;
+}
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -51,7 +68,6 @@ function App() {
     const db = getFirestore();
     const unsubscribe = onSnapshot(doc(db, "sessions", session.id), (snapshot) => {
       if (snapshot.exists()) {
-        console.log("Data from Firestore had updated:", snapshot.data());
         setSession({ id: snapshot.id, ...snapshot.data() } as Session);
       }
     });
@@ -60,14 +76,12 @@ function App() {
   }, [session?.id]);
 
   const handleStartGame = async () => {
-    console.log("--- Game starting ---");
     if (user) {
       try {
         const sessionId = await createSession("New Game", codename, user.uid);
-        console.log("✅ Success! ID:", sessionId);
         setSession({ id: sessionId } as any); 
       } catch (err) {
-        console.error("❌ Error:", err);
+        console.error("Game session error:", err);
         alert("Error starting game");
       }
     }
@@ -79,7 +93,7 @@ function App() {
       await joinSession(joinId.trim(), codename, user.uid);
       setSession({ id: joinId.trim() } as any);
     } catch (err) {
-      console.error("❌ Join Error:", err);
+      console.error("Join Error:", err);
       alert("Room not found!"); 
     }
   };
@@ -96,6 +110,8 @@ function App() {
 
   return (
     <div className="App">
+      <RouteAnalytics />
+
       <section id="center">
         <h1>Project Matrix</h1>
 
@@ -115,7 +131,7 @@ function App() {
                 <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                   <input 
                     type="text" 
-                    placeholder="Syötä huoneen ID" 
+                    placeholder="Room ID..." 
                     value={joinId}
                     onChange={(e) => setJoinId(e.target.value)}
                     style={{ 
@@ -134,9 +150,9 @@ function App() {
             ) : (
               <div style={{ marginTop: '20px', padding: '20px', border: '2px solid #68a4ff', borderRadius: '10px', background: '#1a1a1a' }}>
                 <h3>🎮 Pelihuone aktiivinen</h3>
-                <p>Tila: <span style={{ color: '#4caf50' }}>{session.status}</span></p>
+                <p>Status: <span style={{ color: '#4caf50' }}>{session.status}</span></p>
                 <p>Arvaa hinta tuotteelle:</p>
-                <h2 style={{ color: '#ffcc00' }}>{session.productName || "Etsitään tuotetta..."}</h2>
+                <h2 style={{ color: '#ffcc00' }}>{session.productName || "Searching product..."}</h2>
                 
                 <QuizForm 
                   players={session.players || []}
@@ -165,12 +181,17 @@ function App() {
               >
                 Kirjaudu ulos
               </button>
+              <a href="/viikko6.html" style={{ color: '#68a4ff', display: 'block', marginTop: '10px' }}>
+              Viikko 6: Analytiikka ja CORS
+              </a>
             </div>
           </>
         ) : (
           <LoginForm />
         )}
       </section>
+
+      <ConsentBanner />
     </div>
   );
 }
