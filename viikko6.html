@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="fi">
 <head>
+    <meta charset="UTF-8">
     <title>Viikko 6</title>
+    <link rel="stylesheet" type="text/css" href="matrix-way/styles.css">
 </head>
 <body>
-    <h1>Viikko 6</h1>
-    <p>Tähän tulee tehtävät.</p>
+    <div class="container">
+        <h1>Viikko 6: Analytiikka ja tietosuoja</h1>
+        
+        <h2>Miksi seurata käyttäjiä?</h2>
+        <p>
+            Analytiikka on pohjimmiltaan tapa ymmärtää, toimiiko sovellus oikein, onko jokin rikki ja miten voidaan välttää ajan myötä syntyvät ongelmat. 
+            Esimerkiksi tässä oppimisprojektissa, eli hinnanarvauspelissä, analytiikka auttaa näkemään, missä vaiheessa pelaajat sulkevat sivun. 
+            Onko "Arvaa"-painike liian pieni? Ovatko säännöt epäselvät? Vai jumittaako sovellus heikommilla tietokoneilla?
+        </p>
+        <p>
+            Cloudflaren avulla tämä on erittäin helppo selvittää puuttumatta ihmisten yksityisyyteen tai henkilökohtaisiin tietoihin, sillä sovellus ei varasta niitä. 
+            Käytännössä analytiikka tässä tapauksessa tekee pelistä mukavamman ja paremman, auttaa välttämään bugeja ja ratkaisemaan ongelmia, joita uudet pelaajat saattaisivat kohdata, tukeutuen pelaajien todellisiin toimintoihin.
+        </p>
+
+        <h2>Kuinka välttää CORS-ongelmat</h2>
+        <p>
+            Kun määritin analytiikkaa, en kohdannut CORS-virhettä. Siitä huolimatta sen kanssa voi ilmetä tiettyjä vaikeuksia. Se on tavallaan selaimen "vartija". 
+            Sen tarkoituksena on estää sivustoa lähettämästä tietoja muuhun osoitteeseen, jos kyseessä on jokin ulkopuolinen resurssi, joka ei liity omaan sivuumme.
+        </p>
+        
+        <h3>Ratkaisutapoja:</h3>
+        <ul>
+            <li><span class="highlight">Palvelimen otsikot:</span> Pyydetään palvelinta määrittämään otsikot (headers) lisäämällä sinne tarvittava linkki.</li>
+            <li><span class="highlight">Pilvifunktiot:</span> Käytetään Cloudflare Workers -työkaluja, jotta turvallisuussäännöt voidaan määrittää nopeasti omiin tarpeisiin sopiviksi.</li>
+        </ul>
+
+        <h2>Linkki:</h2>
+        <ul>
+            <li><a href="https://orionfortune.github.io/Pilvipalvelut_web-kehityksess-/matrix-way/">👉 Live-demo (Peli)</a></li>
+        </ul>
+    </div>
 </body>
 </html>
