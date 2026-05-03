@@ -181,9 +181,6 @@ function App() {
               >
                 Kirjaudu ulos
               </button>
-              <a href="https://orionfortune.github.io/Pilvipalvelut_web-kehityksess-/viikko6.html" style={{ color: '#68a4ff', display: 'block', marginTop: '10px' }}>
-              Viikko 6: Analytiikka ja CORS
-              </a>
             </div>
           </>
         ) : (
