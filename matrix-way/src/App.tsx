@@ -181,7 +181,7 @@ function App() {
               >
                 Kirjaudu ulos
               </button>
-              <a href="/viikko6.html" style={{ color: '#68a4ff', display: 'block', marginTop: '10px' }}>
+              <a href="../viikko6.html" style={{ color: '#68a4ff', display: 'block', marginTop: '10px' }}>
               Viikko 6: Analytiikka ja CORS
               </a>
             </div>
