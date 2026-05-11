@@ -1,10 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="fi">
 <head>
-    <title>Harjoitustyo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harjoitustyö: Mielenrauha</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-    <h1>Harjoitustyo</h1>
-    <p>Tähän tulee harjoitustyo.</p>
+    <div class="container">
+        <h1>Harjoitustyö: Mielenrauha-sovellus</h1>
+        
+        <p>
+            Mielenrauha on React-pohjainen sovellus, joka auttaa käyttäjiä löytämään hetken rauhaa tarjoamalla inspiroivia sitaatteja ja kirjasuosituksia mielialan mukaan. 
+            Sovellus hyödyntää Firebase-ekosysteemiä autentikointiin ja tietokannan hallintaan.
+        </p>
+        <h2>Tekninen toteutus ja julkaisu</h2>
+        <p>
+         Sovellus on julkaistu <strong>Firebase Hosting</strong> -palvelun kautta, vaikka lähdekoodi on saatavilla GitHubissa. 
+        Tämä valinta tehtiin, jotta sovellus integroituu saumattomasti Firebase-ekosysteemiin (Auth ja Firestore). 
+        Julkaisuprosessi toteutettiin Firebase CLI -työkalulla, mikä mahdollistaa nopean ja turvallisen pilvipohjaisen jakelun.
+        </p>
+        <h2>1. Responsiivisuusraportti</h2>
+        <p>
+            Testaustavoitteena oli varmistaa sovelluksen käytettävyys ja visuaalinen eheys eri näyttökoilla.
+        </p>
+        <p>
+            <strong>Testatut laitteet:</strong> Poco X8 Pro (Mozilla Firefox), Desktop 1920x1080 (Chrome).
+        </p>
+        <p>
+            Käyttöliittymä mukautuu automaattisesti laitteen koon mukaan Tailwind CSS -kehityskehyksen ansiosta. 
+            Mobiililaitteilla painikkeet ovat riittävän suuria ja helppokäyttöisiä. 
+            Taustagradientti ja animoidut elementit (kuten terälehdet ja pilvet) täyttävät koko näytön kaikilla resoluutioilla ilman näkyviä reunoja tai katkoja.
+        </p>
+        <p class="highlight-box">
+            Tulos: Sovellus on täysin responsiivinen.
+        </p>
+
+        <h2>2. Selainyhteensopivuusraportti</h2>
+        <p>
+            Testaustavoitteena oli varmistaa sovelluksen toimivuus suosituimmilla nykyaikaisilla selaimilla.
+        </p>
+        <p>
+            <strong>Testatut selaimet:</strong> Google Chrome, Mozilla Firefox ja Opera.
+        </p>
+        <p>
+            Kirjautuminen ja rekisteröinti toimivat viiveettä kaikilla testatuilla selaimilla. 
+            Musiikkiominaisuus vaatii selainten tietosuojakäytäntöjen vuoksi käyttäjän aktiivisen klikkauksen ("Musiikki päällä"), mikä on odotettu ja standardinmukainen käytäntö. 
+            Animaatiot toistuvat sulavasti kaikissa ympäristöissä.
+        </p>
+        <p class="highlight-box">
+            Tulos: Sovellus tukee kaikkia moderneja selaimia.
+        </p>
+
+        <h2>3. Latausaikaraportti</h2>
+        <p>
+            Testaustapa: Selaimen Network-työkalu (Chrome DevTools).
+        </p>
+        
+        <h3>Tulokset:</h3>
+        <ul>
+            <li><span class="highlight">Sivun latausaika (Load):</span> 54 ms</li>
+            <li><span class="highlight">Kokonaislatausaika (Finish):</span> 533 ms</li>
+        </ul>
+        
+        <p>
+            Sovellus latautuu erittäin nopeasti Vite-optimoinnin ja Firebase Hostingin tehokkuuden ansiosta. 
+            Kokonaislatausaika on selvästi alle suositellun 2 sekunnin rajan, mikä takaa erinomaisen käyttökokemuksen.
+        </p>
+
+        <h2>Linkit:</h2>
+        <ul>
+            <li><a href="https://mood-tracker-zen.web.app/">👉 Live-demo (Mielenrauha)</a></li>
+            <li><a href="https://github.com/OrionFortune/mood-tracker-zen">📂 GitHub-projekti</a></li>
+        </ul>
+    </div>
 </body>
 </html>
